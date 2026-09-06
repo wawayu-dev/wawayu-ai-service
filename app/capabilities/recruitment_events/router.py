@@ -9,6 +9,7 @@ from app.capabilities.recruitment_events.schemas import (
     AnalyzeRecruitmentEventResponse,
 )
 from app.capabilities.recruitment_events.service import (
+    AnalysisAuthenticationError,
     AnalysisProviderError,
     AnalysisTimeoutError,
     RecruitmentEventAnalyzer,
@@ -90,6 +91,14 @@ async def analyze_recruitment_event(
 ) -> AnalyzeRecruitmentEventResponse:
     try:
         return await analyzer.analyze(request)
+    except AnalysisAuthenticationError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail={
+                "code": "AI_PROVIDER_AUTHENTICATION_ERROR",
+                "message": "The configured model credentials were rejected.",
+            },
+        ) from exc
     except AnalysisTimeoutError as exc:
         raise HTTPException(
             status_code=status.HTTP_504_GATEWAY_TIMEOUT,
@@ -103,6 +112,9 @@ async def analyze_recruitment_event(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail={
                 "code": "AI_PROVIDER_ERROR",
-                "message": "The model provider returned an invalid response.",
+                "message": (
+                    "The model provider request failed or returned an invalid "
+                    "response."
+                ),
             },
         ) from exc

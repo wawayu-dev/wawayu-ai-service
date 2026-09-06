@@ -25,6 +25,10 @@ class AnalysisProviderError(Exception):
     """The provider failed or returned an invalid structured result."""
 
 
+class AnalysisAuthenticationError(Exception):
+    """The model provider rejected the configured credentials."""
+
+
 class RecruitmentEventAnalyzer:
     def __init__(
         self,
@@ -54,6 +58,8 @@ class RecruitmentEventAnalyzer:
         except Exception as exc:
             if _is_timeout(exc):
                 raise AnalysisTimeoutError from exc
+            if _is_authentication_error(exc):
+                raise AnalysisAuthenticationError from exc
             if isinstance(exc, ValidationError):
                 raise AnalysisProviderError from exc
             raise AnalysisProviderError from exc
@@ -68,3 +74,7 @@ class RecruitmentEventAnalyzer:
 
 def _is_timeout(exc: Exception) -> bool:
     return isinstance(exc, TimeoutError) or "timeout" in type(exc).__name__.lower()
+
+
+def _is_authentication_error(exc: Exception) -> bool:
+    return "authentication" in type(exc).__name__.lower()

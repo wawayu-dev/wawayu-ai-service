@@ -213,12 +213,16 @@ X-AI-Service-Key: <server-to-server-secret>
 | 401 | `INVALID_AI_SERVICE_KEY` | 检查服务间密钥，不要重试错误凭据 |
 | 422 | FastAPI 校验详情 | 修正请求字段、时区、候选数量或时间格式 |
 | 502 | `AI_PROVIDER_ERROR` | 模型服务失败或结构化结果无效；可有限重试 |
-| 503 | `AI_SERVICE_KEY_NOT_CONFIGURED` / `AI_PROVIDER_NOT_CONFIGURED` | 修复 AI 服务配置后重试 |
+| 503 | `AI_SERVICE_KEY_NOT_CONFIGURED` / `AI_PROVIDER_NOT_CONFIGURED` / `AI_PROVIDER_AUTHENTICATION_ERROR` | 修复 AI 服务或模型凭据配置后重试 |
 | 504 | `AI_PROVIDER_TIMEOUT` | 使用相同业务幂等上下文有限重试 |
 
 调用方不应在错误日志中记录完整通知正文。`analysisId` 可用于单次分析链路追踪，`sourceFingerprint` 用于用户业务范围内的通知去重，两者都不能代替用户确认。
 
 ## 本地调用
+
+启动服务后可以访问 `http://127.0.0.1:8000/demo/` 打开最小演示页。点击“填充测试数据”，填写本地 `.env` 中的 `AI_SERVICE_API_KEY`，再点击“开始 AI 识别”即可展示匹配、事实、证据、建议阶段和待办草稿。演示页会在当前请求中使用密钥，但不会把密钥写入 localStorage 或 sessionStorage；它只应运行在本地或受控网络中。
+
+也可以使用 curl：
 
 ```bash
 curl -X POST 'http://127.0.0.1:8000/v1/capabilities/recruitment-event-follow-up/analyze' \

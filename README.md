@@ -42,6 +42,8 @@ AI_SERVICE_API_KEY=<long-random-value>
 
 请求与响应示例、状态安全规则和校招雷达接入流程见 [招聘事件跟进能力接入指南](docs/recruitment-event-follow-up.md)。运行时 OpenAPI 位于 `/openapi.json`，交互文档位于 `/docs`。
 
+浏览器演示页位于 `/demo/`。填写本地配置的 `AI_SERVICE_API_KEY` 后，可使用“填充测试数据”快速演示当前能力；该页面只用于本地或受控环境，不应暴露在公网。
+
 ## 运行测试
 
 ```bash

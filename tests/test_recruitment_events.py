@@ -27,6 +27,7 @@ from app.capabilities.recruitment_events.schemas import (
     TextFact,
 )
 from app.capabilities.recruitment_events.service import (
+    AnalysisAuthenticationError,
     AnalysisProviderError,
     AnalysisTimeoutError,
     RecruitmentEventAnalyzer,
@@ -460,6 +461,11 @@ def test_api_returns_camel_case_response_without_network() -> None:
 @pytest.mark.parametrize(
     ("error", "expected_status", "expected_code"),
     [
+        (
+            AnalysisAuthenticationError(),
+            503,
+            "AI_PROVIDER_AUTHENTICATION_ERROR",
+        ),
         (AnalysisTimeoutError(), 504, "AI_PROVIDER_TIMEOUT"),
         (AnalysisProviderError(), 502, "AI_PROVIDER_ERROR"),
     ],
@@ -554,6 +560,10 @@ class FakeChatModel:
         return FakeStructuredModel(self.result)
 
 
+class FakeAuthenticationError(Exception):
+    pass
+
+
 @pytest.mark.asyncio
 async def test_analyzer_uses_structured_model_and_postprocessing() -> None:
     analyzer = RecruitmentEventAnalyzer(
@@ -589,6 +599,18 @@ async def test_analyzer_maps_model_timeout() -> None:
     )
 
     with pytest.raises(AnalysisTimeoutError):
+        await analyzer.analyze(
+            AnalyzeRecruitmentEventRequest.model_validate(request_payload())
+        )
+
+
+@pytest.mark.asyncio
+async def test_analyzer_maps_model_authentication_error() -> None:
+    analyzer = RecruitmentEventAnalyzer(
+        FakeChatModel(FakeAuthenticationError()),  # type: ignore[arg-type]
+    )
+
+    with pytest.raises(AnalysisAuthenticationError):
         await analyzer.analyze(
             AnalyzeRecruitmentEventRequest.model_validate(request_payload())
         )

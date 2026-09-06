@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>校招雷达 · AI 招聘事件跟进演示</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="hero">
+        <p class="eyebrow">校招雷达 · 能力原型</p>
+        <h1>AI 招聘事件跟进</h1>
+        <p class="hero-copy">
+          输入一条招聘通知和用户当前投递，演示岗位匹配、阶段识别、时间提取与待办生成。AI
+          只产生候选变更，最终仍需用户确认。
+        </p>
+        <div class="capabilities" aria-label="已实现能力">
+          <span>岗位匹配</span><span>事件抽取</span><span>阶段保护</span
+          ><span>原文证据</span>
+        </div>
+      </header>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <div>
+            <p class="step">01 · 准备输入</p>
+            <h2>招聘通知与候选投递</h2>
+          </div>
+          <button id="fill-demo" class="button secondary" type="button">
+            填充测试数据
+          </button>
+        </div>
+
+        <form id="analysis-form">
+          <div class="field full-width">
+            <label for="service-key">内部测试密钥</label>
+            <input
+              id="service-key"
+              type="password"
+              autocomplete="off"
+              placeholder="填写 AI_SERVICE_API_KEY"
+              required
+            />
+            <small>仅用于本次请求，不会保存在浏览器中。</small>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="channel">通知渠道</label>
+              <select id="channel">
+                <option value="EMAIL">邮件</option>
+                <option value="SMS">短信</option>
+                <option value="PHONE_NOTE">电话记录</option>
+                <option value="RECRUITMENT_PLATFORM">招聘平台</option>
+                <option value="OTHER">其他</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="received-at">接收时间</label>
+              <input id="received-at" type="datetime-local" required />
+            </div>
+            <div class="field full-width">
+              <label for="subject">通知标题</label>
+              <input id="subject" maxlength="500" placeholder="例如：在线测评通知" />
+            </div>
+            <div class="field full-width">
+              <label for="content">通知正文</label>
+              <textarea
+                id="content"
+                maxlength="20000"
+                rows="5"
+                placeholder="粘贴招聘邮件、短信或电话沟通记录"
+                required
+              ></textarea>
+            </div>
+          </div>
+
+          <fieldset>
+            <legend>用户当前投递</legend>
+            <div class="form-grid compact">
+              <div class="field">
+                <label for="company-name">公司名称</label>
+                <input id="company-name" required />
+              </div>
+              <div class="field">
+                <label for="company-aliases">公司别名</label>
+                <input id="company-aliases" placeholder="多个别名用逗号分隔" />
+              </div>
+              <div class="field">
+                <label for="job-title">岗位名称</label>
+                <input id="job-title" required />
+              </div>
+              <div class="field">
+                <label for="current-stage">当前阶段</label>
+                <select id="current-stage">
+                  <option value="APPLIED">已投递</option>
+                  <option value="ASSESSMENT">测评 / 笔试</option>
+                  <option value="INTERVIEW">面试</option>
+                  <option value="OFFER">Offer</option>
+                  <option value="REJECTED">已拒绝</option>
+                  <option value="WITHDRAWN">已放弃</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="application-id">投递 ID</label>
+                <input id="application-id" required />
+              </div>
+              <div class="field">
+                <label for="job-code">岗位编码</label>
+                <input id="job-code" required />
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="actions">
+            <button id="analyze-button" class="button primary" type="submit">
+              开始 AI 识别
+            </button>
+            <p id="request-status" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+      </section>
+
+      <section id="result-panel" class="panel result-panel" hidden>
+        <div class="panel-heading result-heading">
+          <div>
+            <p class="step">02 · 识别结果</p>
+            <h2>待用户确认的候选变更</h2>
+          </div>
+          <span id="match-badge" class="badge"></span>
+        </div>
+
+        <div id="match-summary" class="match-summary"></div>
+        <div id="facts-grid" class="facts-grid"></div>
+
+        <div class="result-block">
+          <h3>建议更新</h3>
+          <div id="proposed-change"></div>
+        </div>
+
+        <div id="warnings-block" class="result-block warning-block" hidden>
+          <h3>安全提示</h3>
+          <ul id="warnings-list"></ul>
+        </div>
+
+        <details class="raw-result">
+          <summary>查看完整 JSON</summary>
+          <pre id="raw-json"></pre>
+        </details>
+      </section>
+    </main>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>
