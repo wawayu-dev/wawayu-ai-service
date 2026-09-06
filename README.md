@@ -2,7 +2,7 @@
 
 `wawayu-ai-service` 是长期独立运行的统一 AI 能力服务，负责承载 AI 理解、抽取、分类、匹配、推理和工作流能力。业务事实仍由上游业务系统维护，本服务不作为业务后端使用。
 
-当前阶段仅包含基础工程框架和健康检查接口，不包含具体 AI 业务能力，也不会调用真实大模型。
+当前提供基础健康检查和“招聘事件跟进”原型能力。招聘事件能力会调用配置的真实模型，但只返回待用户确认的候选事实，不直接读写业务数据库。
 
 ## 环境要求
 
@@ -27,11 +27,20 @@ cp .env.example .env
 uv run uvicorn app.main:app --reload
 ```
 
-服务启动后，唯一的接口为：
+服务启动后提供以下接口：
 
 ```text
 GET /health
+POST /v1/capabilities/recruitment-event-follow-up/analyze
 ```
+
+招聘事件接口使用 `X-AI-Service-Key` 做服务间鉴权，需要配置：
+
+```text
+AI_SERVICE_API_KEY=<long-random-value>
+```
+
+请求与响应示例、状态安全规则和校招雷达接入流程见 [招聘事件跟进能力接入指南](docs/recruitment-event-follow-up.md)。运行时 OpenAPI 位于 `/openapi.json`，交互文档位于 `/docs`。
 
 ## 运行测试
 

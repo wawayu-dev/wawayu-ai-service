@@ -1,0 +1,1 @@
+"""Recruitment notification analysis capability."""

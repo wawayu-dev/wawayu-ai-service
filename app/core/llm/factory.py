@@ -8,7 +8,7 @@ def get_chat_model(settings: Settings | None = None) -> BaseChatModel:
     """Build the configured chat model without making a model request."""
     resolved_settings = settings or get_settings()
 
-    if resolved_settings.ai_provider != "openai":
+    if resolved_settings.ai_provider != "openai_compatible":
         raise ValueError(
             f"Unsupported AI provider: {resolved_settings.ai_provider}"
         )
@@ -18,4 +18,5 @@ def get_chat_model(settings: Settings | None = None) -> BaseChatModel:
         base_url=resolved_settings.ai_base_url,
         api_key=resolved_settings.ai_api_key,
         timeout=resolved_settings.ai_timeout_seconds,
+        temperature=0,
     )
